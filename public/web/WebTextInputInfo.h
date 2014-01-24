@@ -56,6 +56,9 @@ struct WebTextInputInfo {
     // This string is lower-case.
     WebString inputMode;
 
+    // Previous/Next options.
+    int advancedIMEOptions;
+
     BLINK_EXPORT bool equals(const WebTextInputInfo&) const;
 
     WebTextInputInfo()
@@ -65,6 +68,7 @@ struct WebTextInputInfo {
         , selectionEnd(0)
         , compositionStart(-1)
         , compositionEnd(-1)
+        , advancedIMEOptions(0)
     {
     }
 };

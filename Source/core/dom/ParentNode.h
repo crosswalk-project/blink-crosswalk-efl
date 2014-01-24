@@ -34,6 +34,7 @@
 #include "core/dom/ContainerNode.h"
 #include "core/dom/ElementTraversal.h"
 #include "core/html/HTMLCollection.h"
+#include "core/dom/StaticNodeList.h"
 #include "platform/heap/Handle.h"
 
 namespace blink {

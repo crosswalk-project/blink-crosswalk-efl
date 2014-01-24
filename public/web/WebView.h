@@ -103,6 +103,9 @@ public:
 
     // Options -------------------------------------------------------------
 
+    // Get value to highlight previous/next buttons on IME.
+    virtual int getIMEOptions() = 0;
+
     // The returned pointer is valid for the lifetime of the WebView.
     virtual WebSettings* settings() = 0;
 
@@ -179,6 +182,9 @@ public:
     // to ensure that a text field on the page is not eating keystrokes we
     // send it.
     virtual void clearFocusedElement() = 0;
+
+    // Scrolls the node currently in focus into view.
+    virtual void scrollFocusedNodeIntoView() = 0;
 
     // Scrolls the node currently in focus into |rect|, where |rect| is in
     // window space.
@@ -409,6 +415,11 @@ public:
     // Hides any popup (suggestions, selects...) that might be showing.
     virtual void hidePopups() = 0;
 
+    // Move focus to previous focusable element when previous is clicked on IME.
+    virtual bool moveFocusToPrevious() = 0;
+
+    // Move focus to next focusable element when next is clicked on IME.
+    virtual bool moveFocusToNext() = 0;
 
     // Visited link state --------------------------------------------------
 

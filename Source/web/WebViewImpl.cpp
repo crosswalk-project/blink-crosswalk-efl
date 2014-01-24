@@ -40,6 +40,7 @@
 #include "core/dom/DocumentMarkerController.h"
 #include "core/dom/Fullscreen.h"
 #include "core/dom/NodeRenderingTraversal.h"
+#include "core/dom/ParentNode.h"
 #include "core/dom/Text.h"
 #include "core/editing/Editor.h"
 #include "core/editing/FrameSelection.h"
@@ -165,6 +166,9 @@
 #include "wtf/CurrentTime.h"
 #include "wtf/RefPtr.h"
 #include "wtf/TemporaryChange.h"
+#include "core/dom/ElementTraversal.h"
+#include "core/html/HTMLFrameOwnerElement.h"
+#include "core/html/HTMLSelectElement.h"
 
 #if USE(DEFAULT_RENDER_THEME)
 #include "core/rendering/RenderThemeChromiumDefault.h"
@@ -2297,6 +2301,8 @@ WebTextInputInfo WebViewImpl::textInputInfo()
     if (!focusedFrame->isLocalFrame())
         return info;
 
+    info.advancedIMEOptions = m_client->advancedIMEOptions();
+
     LocalFrame* focused = toLocalFrame(focusedFrame);
     if (!focused)
         return info;
@@ -2814,6 +2820,12 @@ void WebViewImpl::clearFocusedElement()
     // keystrokes get eaten as a result.
     if (oldFocusedElement->isContentEditable() || oldFocusedElement->isTextFormControl())
         localFrame->selection().clear();
+}
+
+void WebViewImpl::scrollFocusedNodeIntoView()
+{
+    if (Element* element = focusedElement())
+        element->scrollIntoViewIfNeeded(true /*centerIfNeeded*/);
 }
 
 void WebViewImpl::scrollFocusedNodeIntoRect(const WebRect& rect)
@@ -4518,6 +4530,230 @@ void WebViewImpl::resumeScheduledTasks()
         ASSERT(document);
         document->resumeScheduledTasks();
     }
+}
+
+bool WebViewImpl::isFormNavigationTextInput(Element& element) const
+{
+    if (element.hasTagName(HTMLNames::inputTag) && toHTMLInputElement(element).isReadOnly())
+        return false;
+
+    RenderObject* renderer = element.renderer();
+    return renderer && (element.isContentEditable() || renderer->isTextControl());
+}
+
+bool WebViewImpl::isSelectElement(const Element& element) const
+{
+    return element.renderer() && element.hasTagName(HTMLNames::selectTag);
+}
+
+IntRect WebViewImpl::getElementBounds(const Element& element) const
+{
+    element.document().updateLayoutIgnorePendingStylesheets();
+    IntRect absoluteRect = pixelSnappedIntRect(element.Node::boundingBox());
+    return (element.document().view() ? element.document().view()->contentsToWindow(absoluteRect) : IntRect());
+}
+
+bool WebViewImpl::performClickOnElement(Element& element)
+{
+    if (IntRect() == getElementBounds(element))
+        return false;
+
+    // Set focus to false to compare it with focusedElement of document.
+    element.focus(false);
+
+    Element* focusElement = focusedElement();
+
+    if (!focusElement || focusElement != &element)
+        return false;
+
+    focusElement->dispatchSimulatedClick(0, SendMouseUpDownEvents);
+
+    if (isFormNavigationTextInput(*focusElement)) {
+        WebTextInputInfo info = textInputInfo();
+        toLocalFrame(focusedCoreFrame())->inputMethodController().setEditableSelectionOffsets(PlainTextRange(info.selectionStart, info.selectionEnd));
+    }
+
+    m_client->performMouseClick();
+
+    return true;
+}
+
+Element* WebViewImpl::nextTextOrSelectElement(Element* element)
+{
+    if (!element)
+        return 0;
+
+    Element* nextElement = element;
+
+    if (nextElement->isFrameOwnerElement()) {
+        HTMLFrameOwnerElement& htmlFrameOwnerElement = *toHTMLFrameOwnerElement(nextElement);
+
+        // Checks if the frame is empty or not.
+        if (!htmlFrameOwnerElement.contentFrame())
+            return 0;
+
+        Document* ownerDocument = htmlFrameOwnerElement.contentDocument();
+        if (!ownerDocument || !(nextElement = ownerDocument->body()))
+            return 0;
+
+        // Checks if content editable flag on body has set.
+        if (nextElement->isContentEditable())
+            return nextElement;
+    }
+
+    while ((nextElement = ElementTraversal::next(*nextElement))) {
+        if (nextElement->hasTagName(HTMLNames::iframeTag)
+            || nextElement->hasTagName(HTMLNames::frameTag)) {
+            Element* frameOwnerElement = nextElement;
+
+            nextElement = nextTextOrSelectElement(nextElement);
+            if (!nextElement) {
+                nextElement = frameOwnerElement;
+                continue;
+            }
+        }
+
+        if (nextElement->isFocusable() && (isFormNavigationTextInput(*nextElement)
+            || isSelectElement(*nextElement)))
+            break;
+    }
+
+    // If couldn't find anything in the current document scope,
+    // try finding in other document scope if present any.
+    if (!nextElement) {
+        if (element->document().frame() != mainFrameImpl()->frame() && !element->isFrameOwnerElement())
+            nextElement = nextTextOrSelectElement(ElementTraversal::next(*element->document().ownerElement()));
+    }
+
+    return nextElement;
+}
+
+Element* WebViewImpl::previousTextOrSelectElement(Element* element)
+{
+    if (!element)
+        return 0;
+
+    Element* previousElement = element;
+
+    if (previousElement->isFrameOwnerElement()) {
+        HTMLFrameOwnerElement& htmlFrameOwnerElement = *toHTMLFrameOwnerElement(previousElement);
+
+        // Checks if the frame is empty or not.
+        if (!htmlFrameOwnerElement.contentFrame())
+            return 0;
+
+        Document* ownerDocument = htmlFrameOwnerElement.contentDocument();
+        if (!ownerDocument)
+            return 0;
+
+        previousElement = ParentNode::lastElementChild(*ownerDocument);
+        while (previousElement && ElementTraversal::firstWithin(*previousElement))
+            previousElement = ParentNode::lastElementChild(*previousElement);
+
+        if (!previousElement || (previousElement->isFocusable()
+            && (isFormNavigationTextInput(*previousElement) || isSelectElement(*previousElement))))
+            return previousElement;
+    }
+
+    while ((previousElement = ElementTraversal::previous(*previousElement))) {
+        if (previousElement->hasTagName(HTMLNames::iframeTag)
+            || previousElement->hasTagName(HTMLNames::frameTag)) {
+            Element* frameOwnerElement = previousElement;
+
+            previousElement = previousTextOrSelectElement(previousElement);
+            if (!previousElement) {
+                previousElement = frameOwnerElement;
+                continue;
+            }
+        }
+
+        if (previousElement->isFocusable() && (isFormNavigationTextInput(*previousElement)
+            || isSelectElement(*previousElement)))
+            break;
+    }
+
+    // If couldn't find anything in the current document scope,
+    // try finding in other document scope if present any.
+    if (!previousElement) {
+        if (element->document().frame() != mainFrameImpl()->frame() && !element->isFrameOwnerElement())
+            previousElement = previousTextOrSelectElement(ElementTraversal::previous(*element->document().ownerElement()));
+    }
+
+    return previousElement;
+}
+
+bool WebViewImpl::moveFocusToNext()
+{
+    Element* focusElement = focusedElement();
+    if (!focusElement || (!isFormNavigationTextInput(*focusElement) && !isSelectElement(*focusElement)))
+        return false;
+
+    Element* nextElement = nextTextOrSelectElement(focusElement);
+    if (!nextElement)
+        return false;
+
+    if (isSelectElement(*nextElement) && !toHTMLSelectElement(nextElement)->length())
+        m_client->messageToClosePopup();
+
+    // Scroll the element into center of screen.
+    nextElement->scrollIntoViewIfNeeded(true /*centerIfNeeded*/);
+
+    bool handled = performClickOnElement(*nextElement);
+
+    if (focusedFrame() && isFormNavigationTextInput(*nextElement))
+        focusedFrame()->executeCommand(WebString::fromUTF8("MoveToEndOfDocument"));
+
+    return handled;
+}
+
+bool WebViewImpl::moveFocusToPrevious()
+{
+    Element* focusElement = focusedElement();
+
+    if (!focusElement || (!isFormNavigationTextInput(*focusElement) && !isSelectElement(*focusElement)))
+        return false;
+
+    Element* previousElement = previousTextOrSelectElement(focusElement);
+    if (!previousElement)
+        return false;
+
+    if (isSelectElement(*previousElement) && !toHTMLSelectElement(previousElement)->length())
+        m_client->messageToClosePopup();
+
+    // Scroll the element into center of screen.
+    previousElement->scrollIntoViewIfNeeded(true /*centerIfNeeded*/);
+
+    bool handled = performClickOnElement(*previousElement);
+
+    if (focusedFrame() && isFormNavigationTextInput(*previousElement))
+        focusedFrame()->executeCommand(WebString::fromUTF8("MoveToEndOfDocument"));
+
+    return handled;
+}
+
+int WebViewImpl::getIMEOptions()
+{
+    int action = FormInputNone;
+
+    Element* focusElement = focusedElement();
+    if (!focusElement || (!isSelectElement(*focusElement) && !isFormNavigationTextInput(*focusElement)))
+        return action;
+
+    if (Element* next = nextTextOrSelectElement(focusElement)) {
+        if (isFormNavigationTextInput(*next))
+            action |= FormInputNextText;
+        else
+            action |= FormInputNextSelect;
+    }
+
+    if (Element* prev = previousTextOrSelectElement(focusElement)) {
+        if (isFormNavigationTextInput(*prev))
+            action |= FormInputPrevText;
+        else
+            action |= FormInputPrevSelect;
+    }
+
+    return action;
 }
 
 } // namespace blink

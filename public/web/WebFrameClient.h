@@ -129,6 +129,8 @@ public:
     virtual WebExternalPopupMenu* createExternalPopupMenu(
         const WebPopupMenuInfo&, WebExternalPopupMenuClient*) { return 0; }
 
+    // Destroys externalpopup menu.
+    virtual void destroyExternalPopupMenu(WebExternalPopupMenuClient*) { }
 
     // Services ------------------------------------------------------------
 

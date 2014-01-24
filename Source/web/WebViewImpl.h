@@ -183,6 +183,7 @@ public:
     virtual void setFocusedFrame(WebFrame*) override;
     virtual void setInitialFocus(bool reverse) override;
     virtual void clearFocusedElement() override;
+    virtual void scrollFocusedNodeIntoView() override;
     virtual void scrollFocusedNodeIntoRect(const WebRect&) override;
     virtual void zoomToFindInPageRect(const WebRect&) override;
     virtual void advanceFocus(bool reverse) override;
@@ -271,6 +272,10 @@ public:
     virtual void setShowScrollBottleneckRects(bool) override;
     virtual void getSelectionRootBounds(WebRect& bounds) const override;
     virtual void acceptLanguagesChanged() override;
+
+    virtual bool moveFocusToNext() override;
+    virtual bool moveFocusToPrevious() override;
+    virtual int getIMEOptions() override;
 
     // WebViewImpl
 
@@ -544,6 +549,14 @@ private:
       DragOver
     };
 
+    enum FormInputAction {
+        FormInputNone  = 0x00,
+        FormInputPrevText  = 0x01,
+        FormInputPrevSelect = 0x02,
+        FormInputNextText  = 0x04,
+        FormInputNextSelect  = 0x08,
+    };
+
     explicit WebViewImpl(WebViewClient*);
     virtual ~WebViewImpl();
 
@@ -752,6 +765,13 @@ private:
     // The top controls offset at the time of the last Resize event. This is the
     // amount that the viewport was shrunk by to accomodate the top controls.
     float m_topControlsLayoutHeight;
+
+    bool isFormNavigationTextInput(Element&) const;
+    bool isSelectElement(const Element&) const;
+    bool performClickOnElement(Element&);
+    Element* nextTextOrSelectElement(Element*);
+    Element* previousTextOrSelectElement(Element*);
+    IntRect getElementBounds(const Element&) const;
 };
 
 // We have no ways to check if the specified WebView is an instance of

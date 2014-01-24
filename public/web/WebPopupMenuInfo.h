@@ -38,6 +38,7 @@ namespace blink {
 
 // Describes the contents of a popup menu.
 struct WebPopupMenuInfo {
+    int advancedIMEOptions;
     int itemHeight;
     int itemFontSize;
     int selectedIndex;

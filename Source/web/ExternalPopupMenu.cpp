@@ -45,6 +45,7 @@
 #include "public/web/WebFrameClient.h"
 #include "public/web/WebMenuItemInfo.h"
 #include "public/web/WebPopupMenuInfo.h"
+#include "public/web/WebViewClient.h"
 #include "web/WebLocalFrameImpl.h"
 #include "web/WebViewImpl.h"
 
@@ -61,6 +62,9 @@ ExternalPopupMenu::ExternalPopupMenu(LocalFrame& frame, PopupMenuClient* popupMe
 
 ExternalPopupMenu::~ExternalPopupMenu()
 {
+    WebLocalFrameImpl* webframe = WebLocalFrameImpl::fromFrame(m_localFrame.get());
+    if (webframe && webframe->client())
+        webframe->client()->destroyExternalPopupMenu(this);
 }
 
 void ExternalPopupMenu::trace(Visitor* visitor)
@@ -81,6 +85,7 @@ void ExternalPopupMenu::show(const FloatQuad& controlPosition, const IntSize&, i
 
     WebPopupMenuInfo info;
     getPopupMenuInfo(info, *m_popupMenuClient);
+    info.advancedIMEOptions = m_webView.client()->advancedIMEOptions();
     if (info.items.isEmpty())
         return;
     WebLocalFrameImpl* webframe = WebLocalFrameImpl::fromFrame(m_localFrame.get());
@@ -224,7 +229,6 @@ void ExternalPopupMenu::getPopupMenuInfo(WebPopupMenuInfo& info, PopupMenuClient
     if (count < itemCount)
         items.shrink(count);
     info.items = items;
-
 }
 
 int ExternalPopupMenu::toPopupMenuItemIndex(int externalPopupMenuItemIndex, PopupMenuClient& popupMenuClient)

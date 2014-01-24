@@ -194,6 +194,15 @@ public:
     virtual void focusNext() { }
     virtual void focusPrevious() { }
 
+    // Called to close select when items in it are zero.
+    virtual void messageToClosePopup() { };
+
+    // Updates text input state info.
+    virtual void performMouseClick() { };
+
+    // Get stored value of advancedIMEOptions.
+    virtual int advancedIMEOptions() const { return 0; }
+
     // Called when a new node gets focused.
     virtual void focusedNodeChanged(const WebNode&) { }
 
