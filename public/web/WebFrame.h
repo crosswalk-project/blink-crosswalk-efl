@@ -35,6 +35,7 @@
 #include "WebHistoryItem.h"
 #include "WebIconURL.h"
 #include "WebNode.h"
+#include "WebTriState.h"
 #include "WebURLLoaderOptions.h"
 #include "public/platform/WebCanvas.h"
 #include "public/platform/WebMessagePortChannel.h"
@@ -429,6 +430,10 @@ public:
     virtual bool executeCommand(const WebString&, const WebNode& = WebNode()) = 0;
     virtual bool executeCommand(const WebString&, const WebString& value, const WebNode& = WebNode()) = 0;
     virtual bool isCommandEnabled(const WebString&) const = 0;
+
+    // Returns editor command's state and value.
+    virtual WebTriState commandState(const WebString&) const = 0;
+    virtual WebString commandValue(const WebString&) const = 0;
 
     // Spell-checking support.
     virtual void enableContinuousSpellChecking(bool) = 0;

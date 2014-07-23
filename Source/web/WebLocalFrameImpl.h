@@ -155,6 +155,8 @@ public:
     virtual size_t characterIndexForPoint(const WebPoint&) const override;
     virtual bool executeCommand(const WebString&, const WebNode& = WebNode()) override;
     virtual bool executeCommand(const WebString&, const WebString& value, const WebNode& = WebNode()) override;
+    virtual WebTriState commandState(const WebString&) const override;
+    virtual WebString commandValue(const WebString&) const override;
     virtual bool isCommandEnabled(const WebString&) const override;
     virtual void enableContinuousSpellChecking(bool) override;
     virtual bool isContinuousSpellCheckingEnabled() const override;
