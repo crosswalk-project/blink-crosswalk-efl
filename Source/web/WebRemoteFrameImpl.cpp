@@ -548,6 +548,18 @@ bool WebRemoteFrameImpl::isCommandEnabled(const WebString&) const
     return false;
 }
 
+WebTriState WebRemoteFrameImpl::commandState(const WebString&) const
+{
+    ASSERT_NOT_REACHED();
+    return WebFalseTriState;
+}
+
+WebString WebRemoteFrameImpl::commandValue(const WebString&) const
+{
+    ASSERT_NOT_REACHED();
+    return WebString();
+}
+
 void WebRemoteFrameImpl::enableContinuousSpellChecking(bool)
 {
 }

@@ -108,6 +108,8 @@ public:
     virtual bool executeCommand(const WebString&, const WebNode& = WebNode()) OVERRIDE;
     virtual bool executeCommand(const WebString&, const WebString& value, const WebNode& = WebNode()) OVERRIDE;
     virtual bool isCommandEnabled(const WebString&) const OVERRIDE;
+    virtual WebTriState commandState(const WebString&) const OVERRIDE;
+    virtual WebString commandValue(const WebString&) const OVERRIDE;
     virtual void enableContinuousSpellChecking(bool) OVERRIDE;
     virtual bool isContinuousSpellCheckingEnabled() const OVERRIDE;
     virtual void requestTextChecking(const WebElement&) OVERRIDE;

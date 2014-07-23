@@ -130,14 +130,19 @@
 #include "public/web/WebTextCheckingType.h"
 #include "public/web/WebTextDecorationType.h"
 #include "public/web/WebTouchAction.h"
+#include "public/web/WebTriState.h"
 #include "public/web/WebView.h"
 #include "wtf/Assertions.h"
+#include "wtf/TriState.h"
 #include "wtf/text/StringImpl.h"
 
 namespace blink {
 
 #define COMPILE_ASSERT_MATCHING_ENUM(public_name, core_name) \
     COMPILE_ASSERT(int(public_name) == int(core_name), mismatching_enums)
+
+#define COMPILE_ASSERT_MATCHING_WTF_ENUM(webkit_name, wtf_name) \
+    COMPILE_ASSERT(int(blink::webkit_name) == int(WTF::wtf_name), mismatching_enums)
 
 #define COMPILE_ASSERT_MATCHING_UINT64(public_name, core_name) \
     COMPILE_ASSERT(public_name == core_name, mismatching_enums)
@@ -632,6 +637,9 @@ COMPILE_ASSERT_MATCHING_ENUM(WebSettings::PointerTypeFine, PointerTypeFine);
 COMPILE_ASSERT_MATCHING_ENUM(WebSettings::HoverTypeNone, HoverTypeNone);
 COMPILE_ASSERT_MATCHING_ENUM(WebSettings::HoverTypeOnDemand, HoverTypeOnDemand);
 COMPILE_ASSERT_MATCHING_ENUM(WebSettings::HoverTypeHover, HoverTypeHover);
+COMPILE_ASSERT_MATCHING_WTF_ENUM(WebTrueTriState, TrueTriState);
+COMPILE_ASSERT_MATCHING_WTF_ENUM(WebFalseTriState, FalseTriState);
+COMPILE_ASSERT_MATCHING_WTF_ENUM(WebMixedTriState, MixedTriState);
 
 COMPILE_ASSERT_MATCHING_UINT64(kSerializedScriptValueVersion, SerializedScriptValue::wireFormatVersion);
 

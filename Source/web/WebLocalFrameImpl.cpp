@@ -1061,6 +1061,18 @@ bool WebLocalFrameImpl::isCommandEnabled(const WebString& name) const
     return frame()->editor().command(name).isEnabled();
 }
 
+WebTriState WebLocalFrameImpl::commandState(const WebString& name) const
+{
+    ASSERT(frame());
+    return static_cast<WebTriState>(frame()->editor().command(name).state());
+}
+
+WebString WebLocalFrameImpl::commandValue(const WebString& name) const
+{
+    ASSERT(frame());
+    return frame()->editor().command(name).value();
+}
+
 void WebLocalFrameImpl::enableContinuousSpellChecking(bool enable)
 {
     if (enable == isContinuousSpellCheckingEnabled())
