@@ -486,6 +486,9 @@ public:
     // to call the WebViewClient::acceptLanguages().
     virtual void acceptLanguagesChanged() = 0;
 
+    virtual void suspendScheduledTasks() = 0;
+    virtual void resumeScheduledTasks() = 0;
+
     // Testing functionality for TestRunner ---------------------------------
 
 protected:

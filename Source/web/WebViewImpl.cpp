@@ -4418,4 +4418,28 @@ bool WebViewImpl::shouldDisableDesktopWorkarounds()
         || (constraints.minimumScale == constraints.maximumScale && constraints.minimumScale != -1);
 }
 
+void WebViewImpl::suspendScheduledTasks()
+{
+    Frame* mainFrame = m_page->mainFrame();
+    if (!mainFrame)
+        return;
+    for (Frame* frame = mainFrame; frame; frame = frame->tree().traverseNext()) {
+        Document *document = frame->domWindow() ? frame->domWindow()->document() : 0;
+        ASSERT(document);
+        document->suspendScheduledTasks();
+    }
+}
+
+void WebViewImpl::resumeScheduledTasks()
+{
+    Frame* mainFrame = m_page->mainFrame();
+    if (!mainFrame)
+        return;
+    for (Frame* frame = mainFrame; frame; frame = frame->tree().traverseNext()) {
+        Document *document = frame->domWindow() ? frame->domWindow()->document() : 0;
+        ASSERT(document);
+        document->resumeScheduledTasks();
+    }
+}
+
 } // namespace blink
