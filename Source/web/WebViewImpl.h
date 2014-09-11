@@ -506,6 +506,8 @@ public:
     bool matchesHeuristicsForGpuRasterizationForTesting() const { return m_matchesHeuristicsForGpuRasterization; }
 
     virtual void setTopControlsLayoutHeight(float) override;
+    virtual void suspendScheduledTasks();
+    virtual void resumeScheduledTasks();
 
     IntSize mainFrameSize();
 
