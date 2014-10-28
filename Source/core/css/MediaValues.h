@@ -10,6 +10,8 @@
 #include "wtf/RefCounted.h"
 #include "wtf/RefPtr.h"
 
+#include "core/css/ViewMode.h"
+
 namespace blink {
 
 class Document;
@@ -59,6 +61,7 @@ public:
     virtual bool strictMode() const = 0;
     virtual Document* document() const = 0;
     virtual bool hasValues() const = 0;
+    virtual ViewMode viewMode() const = 0;
 
 protected:
     int calculateViewportWidth(LocalFrame*) const;
@@ -77,6 +80,7 @@ protected:
     HoverType calculatePrimaryHoverType(LocalFrame*) const;
     int calculateAvailableHoverTypes(LocalFrame*) const;
     static LocalFrame* frameFrom(Document&);
+    ViewMode calculateViewMode(LocalFrame*) const;
 
 };
 

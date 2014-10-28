@@ -64,6 +64,7 @@ MediaValuesCached::MediaValuesCached(LocalFrame* frame)
     const String mediaType = calculateMediaType(frame);
     if (!mediaType.isEmpty())
         m_data.mediaType = mediaType.isolatedCopy();
+    m_data.viewMode = calculateViewMode(frame);
 }
 
 MediaValuesCached::MediaValuesCached(const MediaValuesCachedData& data)
@@ -168,6 +169,11 @@ Document* MediaValuesCached::document() const
 bool MediaValuesCached::hasValues() const
 {
     return true;
+}
+
+ViewMode MediaValuesCached::viewMode() const
+{
+    return m_data.viewMode;
 }
 
 } // namespace

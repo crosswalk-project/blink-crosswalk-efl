@@ -148,6 +148,7 @@
 #include "wtf/dtoa.h"
 #include "wtf/text/StringBuffer.h"
 #include <v8.h>
+#include "core/css/ViewMode.h"
 
 namespace blink {
 
@@ -2301,6 +2302,28 @@ void Internals::forcePluginPlaceholder(HTMLElement* element, const Dictionary& o
 Iterator* Internals::iterator(ScriptState* scriptState, ExceptionState& exceptionState)
 {
     return new InternalsIterator;
+}
+
+void Internals::setViewMode(const String& viewModeString, ExceptionState& exceptionState)
+{
+    ViewMode viewMode = ViewModeInvalid;
+    Document* document = contextDocument();
+    if (!document)
+        return;
+    Page* page = document->page();
+    if (!page)
+        return;
+
+    if (viewModeString == "windowed") {
+        viewMode = ViewModeWindowed;
+    } else if (viewModeString == "fullscreen") {
+        viewMode = ViewModeFullscreen;
+    } else {
+        exceptionState.throwDOMException(NotFoundError,
+                                         ExceptionMessages::failedToEnumerate("view mode", viewModeString));
+        return;
+    }
+    page->setViewMode(viewMode);
 }
 
 } // namespace blink

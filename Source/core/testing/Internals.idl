@@ -290,4 +290,7 @@
 
     DictionaryTest dictionaryTest();
     UnionTypesTest unionTypesTest();
+
+    // This function sets CSS view-mode media feature value.
+    [RaisesException] void setViewMode(DOMString viewMode);
 };

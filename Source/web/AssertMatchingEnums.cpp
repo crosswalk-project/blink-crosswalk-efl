@@ -137,6 +137,9 @@
 #include "wtf/TriState.h"
 #include "wtf/text/StringImpl.h"
 
+#include "core/css/ViewMode.h"
+#include "public/web/WebViewModeEnums.h"
+
 namespace blink {
 
 #define COMPILE_ASSERT_MATCHING_ENUM(public_name, core_name) \
@@ -655,5 +658,9 @@ COMPILE_ASSERT_MATCHING_WTF_ENUM(WebFalseTriState, FalseTriState);
 COMPILE_ASSERT_MATCHING_WTF_ENUM(WebMixedTriState, MixedTriState);
 
 COMPILE_ASSERT_MATCHING_UINT64(kSerializedScriptValueVersion, SerializedScriptValue::wireFormatVersion);
+
+COMPILE_ASSERT_MATCHING_ENUM(WebViewModeInvalid, ViewModeInvalid);
+COMPILE_ASSERT_MATCHING_ENUM(WebViewModeWindowed, ViewModeWindowed);
+COMPILE_ASSERT_MATCHING_ENUM(WebViewModeFullscreen, ViewModeFullscreen);
 
 } // namespace blink

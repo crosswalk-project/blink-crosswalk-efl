@@ -36,6 +36,7 @@ public:
     virtual const String mediaType() const override;
     virtual Document* document() const override;
     virtual bool hasValues() const override;
+    virtual ViewMode viewMode() const override;
 
 protected:
     MediaValuesDynamic(LocalFrame*);

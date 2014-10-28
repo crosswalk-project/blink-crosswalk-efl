@@ -144,3 +144,6 @@ WebVTTRegions depends_on=Media, status=experimental
 V8IdleTasks
 XSLT status=stable
 SVG1DOM status=stable
+
+// 'force' is not supported, so 'force=no' is omitted.
+CSSViewModeMediaFeature status=experimental

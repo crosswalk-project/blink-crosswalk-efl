@@ -40,6 +40,8 @@
 #include "WebPageVisibilityState.h"
 #include "WebWidget.h"
 
+#include "WebViewModeEnums.h"
+
 namespace blink {
 
 class WebAXObject;
@@ -489,6 +491,13 @@ public:
     virtual void addPageOverlay(WebPageOverlay*, int /*z-order*/) = 0;
     virtual void removePageOverlay(WebPageOverlay*) = 0;
 
+    // ViewMode -------------------------------------------------------------
+
+    // This function sets the CSS media feature "view-mode" value, which allows
+    // a page to set the different visual presentation mode that can be
+    // applied to web applications and thereby apply different styling based
+    // on these different modes using CSS Media Queries.
+    virtual void setViewMode(WebViewMode) = 0;
 
     // i18n -----------------------------------------------------------------
 

@@ -57,6 +57,8 @@
 #include "platform/geometry/FloatRect.h"
 #include "wtf/HashMap.h"
 
+#include "core/page/Page.h"
+
 namespace blink {
 
 using namespace MediaFeatureNames;
@@ -629,6 +631,35 @@ static bool scanMediaFeatureEval(const MediaQueryExpValue& value, MediaFeaturePr
     // future, it needs to be handled here. For now, assume a modern TV with
     // progressive display.
     return (value.id == CSSValueProgressive);
+}
+
+static bool viewModeMediaFeatureEval(const MediaQueryExpValue& value, MediaFeaturePrefix, const MediaValues& mediaValues)
+{
+    if (!RuntimeEnabledFeatures::cssViewModeMediaFeatureEnabled())
+        return false;
+
+    if (!value.isValid())
+        return false;
+
+    if (!value.isID)
+        return false;
+
+    bool returnValue;
+    ViewMode viewModeValue = mediaValues.viewMode();
+
+    switch (value.id) {
+    case CSSValueWindowed:
+        returnValue = (viewModeValue == ViewModeWindowed);
+        break;
+    case CSSValueFullscreen:
+        returnValue = (viewModeValue == ViewModeFullscreen);
+        break;
+    default:
+        ASSERT_NOT_REACHED();
+        returnValue = false;
+        break;
+    }
+    return returnValue;
 }
 
 static void createFunctionMap()

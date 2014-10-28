@@ -142,4 +142,9 @@ bool MediaValuesDynamic::hasValues() const
     return m_frame;
 }
 
+ViewMode MediaValuesDynamic::viewMode() const
+{
+    return calculateViewMode(m_frame);
+}
+
 } // namespace

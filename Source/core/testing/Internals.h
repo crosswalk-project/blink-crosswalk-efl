@@ -334,6 +334,8 @@ public:
 
     Iterator* iterator(ScriptState*, ExceptionState&);
 
+    void setViewMode(const String&, ExceptionState&);
+
 private:
     explicit Internals(Document*);
     Document* contextDocument() const;

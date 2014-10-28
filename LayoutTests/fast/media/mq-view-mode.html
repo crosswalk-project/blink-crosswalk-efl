@@ -1,0 +1,56 @@
+<html>
+<head>
+<title>Test the (view-mode) media feature.</title>
+<script>
+    if (window.testRunner)
+        testRunner.dumpAsText();
+
+    function log(m) {
+        document.getElementById('results').innerHTML += m + '<br>';
+    }
+
+    function testQueries()
+    {
+        var queries = [
+            "(view-mode)",
+            "(View-mode)",
+            "(view-mode:none)",
+            "(view-mode:NoNe)",
+            "(view-mode:windowed)",
+            "(view-mode:winDOWed)",
+            "(view-mode:fullscreen)",
+            "(view-mode:FullScreen)",
+            "(view-mode:bogusvalue)"
+            ];
+        for (var index=0; index < queries.length; index++) {
+            log("Query &quot;" + queries[index] + "&quot: " +
+                window.matchMedia(queries[index]).matches);
+        }
+    }
+
+    function runTests()
+    {
+        log("------------- default configuration -------------");
+        testQueries();
+
+        if (window.internals) {
+            log("------------- with 'windowed' view-mode -------------");
+            internals.setViewMode('windowed');
+            testQueries();
+
+            log("------------- with 'fullscreen' view-mode -------------");
+            internals.setViewMode('fullscreen');
+            testQueries();
+        }
+    }
+
+</script>
+</head>
+<body onload="runTests()">
+    <p>Test the <a href="http://www.w3.org/TR/2012/REC-view-mode-20120619">(view-mode)</a> media feature.
+    </p>
+
+    <div id="results">
+    </div>
+</body>
+</html>

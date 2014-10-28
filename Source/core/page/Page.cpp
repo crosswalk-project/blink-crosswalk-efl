@@ -133,6 +133,7 @@ Page::Page(PageClients& pageClients)
     , m_timerAlignmentInterval(DOMTimer::visiblePageAlignmentInterval())
     , m_visibilityState(PageVisibilityStateVisible)
     , m_isCursorVisible(true)
+    , m_viewMode(ViewModeInvalid)
 #if ENABLE(ASSERT)
     , m_isPainting(false)
 #endif
@@ -194,6 +195,16 @@ PassRefPtrWillBeRawPtr<ClientRectList> Page::nonFastScrollableRects(const LocalF
     for (size_t i = 0; i < rects.size(); ++i)
         quads[i] = FloatRect(rects[i]);
     return ClientRectList::create(quads);
+}
+
+void Page::setViewMode(ViewMode viewMode)
+{
+    ASSERT(viewMode != ViewModeInvalid);
+    if (viewMode == m_viewMode)
+        return;
+    m_viewMode = viewMode;
+    ASSERT(m_mainFrame);
+    scheduleForcedStyleRecalcForAllPages();
 }
 
 void Page::setMainFrame(Frame* mainFrame)

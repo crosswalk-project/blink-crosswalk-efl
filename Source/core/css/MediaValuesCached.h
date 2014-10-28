@@ -6,6 +6,7 @@
 #define MediaValuesCached_h
 
 #include "core/css/MediaValues.h"
+#include "core/css/ViewMode.h"
 
 namespace blink {
 
@@ -28,6 +29,7 @@ public:
         bool threeDEnabled;
         bool strictMode;
         String mediaType;
+        ViewMode viewMode;
 
         MediaValuesCachedData()
             : viewportWidth(0)
@@ -44,6 +46,7 @@ public:
             , defaultFontSize(16)
             , threeDEnabled(false)
             , strictMode(true)
+            , viewMode(ViewModeInvalid)
         {
         }
     };
@@ -73,6 +76,7 @@ public:
     virtual Document* document() const override;
     virtual bool hasValues() const override;
     virtual const String mediaType() const override;
+    virtual ViewMode viewMode() const override;
 
 protected:
     MediaValuesCached();

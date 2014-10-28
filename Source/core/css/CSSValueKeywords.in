@@ -926,6 +926,10 @@ each-line
 progressive
 interlace
 
+// (view-mode:) media feature
+windowed
+fullscreen
+
 //
 // paint-order
 //

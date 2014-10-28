@@ -516,6 +516,8 @@ public:
 
     IntSize mainFrameSize();
 
+    virtual void setViewMode(WebViewMode) override;
+
 private:
     void didUpdateTopControls();
     void setTopControlsContentOffset(float);

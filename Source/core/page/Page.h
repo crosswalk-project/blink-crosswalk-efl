@@ -37,6 +37,8 @@
 #include "wtf/Noncopyable.h"
 #include "wtf/text/WTFString.h"
 
+#include "core/css/ViewMode.h"
+
 namespace blink {
 
 class AutoscrollController;
@@ -209,6 +211,10 @@ public:
     void trace(Visitor*);
     void willBeDestroyed();
 
+
+    ViewMode viewMode() const { return m_viewMode; }
+    void setViewMode(ViewMode);
+
 protected:
     PageLifecycleNotifier& lifecycleNotifier();
 
@@ -271,6 +277,8 @@ private:
     PageVisibilityState m_visibilityState;
 
     bool m_isCursorVisible;
+
+    ViewMode m_viewMode;
 
 #if ENABLE(ASSERT)
     bool m_isPainting;

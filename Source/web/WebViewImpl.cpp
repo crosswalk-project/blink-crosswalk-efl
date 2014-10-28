@@ -178,6 +178,9 @@
 #undef pow
 #include <cmath> // for std::pow
 
+#include "public/web/WebViewModeEnums.h"
+#include "core/css/ViewMode.h"
+
 // The following constants control parameters for automated scaling of webpages
 // (such as due to a double tap gesture or find in page etc.). These are
 // experimentally determined.
@@ -4754,6 +4757,12 @@ int WebViewImpl::getIMEOptions()
     }
 
     return action;
+}
+
+void WebViewImpl::setViewMode(WebViewMode viewMode)
+{
+    if (page())
+        page()->setViewMode(static_cast<ViewMode>(viewMode));
 }
 
 } // namespace blink

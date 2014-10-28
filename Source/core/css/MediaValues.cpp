@@ -208,4 +208,10 @@ LocalFrame* MediaValues::frameFrom(Document& document)
     return executingDocument->frame();
 }
 
+ViewMode MediaValues::calculateViewMode(LocalFrame* frame) const
+{
+    ASSERT(frame && frame->page() && frame->page()->mainFrame());
+    return frame->page()->viewMode();
+}
+
 } // namespace

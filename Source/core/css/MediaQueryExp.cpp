@@ -52,7 +52,8 @@ static inline bool featureWithCSSValueID(const String& mediaFeature, const CSSPa
         || mediaFeature == anyPointerMediaFeature
         || (mediaFeature == hoverMediaFeature && RuntimeEnabledFeatures::hoverMediaQueryKeywordsEnabled())
         || mediaFeature == anyHoverMediaFeature
-        || mediaFeature == scanMediaFeature;
+        || mediaFeature == scanMediaFeature
+        || mediaFeature == viewModeMediaFeature;
 }
 
 static inline bool featureWithValidIdent(const String& mediaFeature, CSSValueID ident)
@@ -69,6 +70,9 @@ static inline bool featureWithValidIdent(const String& mediaFeature, CSSValueID 
 
     if (mediaFeature == scanMediaFeature)
         return ident == CSSValueInterlace || ident == CSSValueProgressive;
+
+    if (mediaFeature == viewModeMediaFeature)
+        return ident == CSSValueWindowed || ident == CSSValueFullscreen;
 
     ASSERT_NOT_REACHED();
     return false;

@@ -1,0 +1,33 @@
+Test the (view-mode) media feature.
+
+------------- default configuration -------------
+Query "(view-mode)": false
+Query "(View-mode)": false
+Query "(view-mode:none)": false
+Query "(view-mode:NoNe)": false
+Query "(view-mode:windowed)": false
+Query "(view-mode:winDOWed)": false
+Query "(view-mode:fullscreen)": false
+Query "(view-mode:FullScreen)": false
+Query "(view-mode:bogusvalue)": false
+------------- with 'windowed' view-mode -------------
+Query "(view-mode)": false
+Query "(View-mode)": false
+Query "(view-mode:none)": false
+Query "(view-mode:NoNe)": false
+Query "(view-mode:windowed)": true
+Query "(view-mode:winDOWed)": true
+Query "(view-mode:fullscreen)": false
+Query "(view-mode:FullScreen)": false
+Query "(view-mode:bogusvalue)": false
+------------- with 'fullscreen' view-mode -------------
+Query "(view-mode)": false
+Query "(View-mode)": false
+Query "(view-mode:none)": false
+Query "(view-mode:NoNe)": false
+Query "(view-mode:windowed)": false
+Query "(view-mode:winDOWed)": false
+Query "(view-mode:fullscreen)": true
+Query "(view-mode:FullScreen)": true
+Query "(view-mode:bogusvalue)": false
+
