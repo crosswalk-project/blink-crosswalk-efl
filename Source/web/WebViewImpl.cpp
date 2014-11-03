@@ -2304,6 +2304,8 @@ WebTextInputInfo WebViewImpl::textInputInfo()
     if (!focusedFrame->isLocalFrame())
         return info;
 
+    info.isInFormTag = isFocusedElementInFormTag();
+
     info.advancedIMEOptions = m_client->advancedIMEOptions();
 
     LocalFrame* focused = toLocalFrame(focusedFrame);
@@ -2349,6 +2351,24 @@ WebTextInputInfo WebViewImpl::textInputInfo()
     }
 
     return info;
+}
+
+bool WebViewImpl::isFocusedElementInFormTag() const
+{
+    Element* element = focusedElement();
+    if (!element)
+        return false;
+
+    if (!isHTMLTextFormControlElement(*element))
+        return false;
+
+    HTMLTextFormControlElement* textControl = toHTMLTextFormControlElement(element);
+    ASSERT(textControl);
+
+    if (textControl->form())
+        return true;
+
+    return false;
 }
 
 WebTextInputType WebViewImpl::textInputType()

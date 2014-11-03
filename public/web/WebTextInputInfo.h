@@ -59,6 +59,8 @@ struct WebTextInputInfo {
     // Previous/Next options.
     int advancedIMEOptions;
 
+    bool isInFormTag;
+
     BLINK_EXPORT bool equals(const WebTextInputInfo&) const;
 
     WebTextInputInfo()
@@ -69,6 +71,7 @@ struct WebTextInputInfo {
         , compositionStart(-1)
         , compositionEnd(-1)
         , advancedIMEOptions(0)
+        , isInFormTag(false)
     {
     }
 };

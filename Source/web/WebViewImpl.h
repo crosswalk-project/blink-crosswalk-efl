@@ -564,6 +564,7 @@ private:
 
     WebTextInputType textInputType();
     int textInputFlags();
+    bool isFocusedElementInFormTag() const;
 
     WebString inputModeOfFocusedElement();
 
