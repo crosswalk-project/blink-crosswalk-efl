@@ -518,6 +518,11 @@ public:
 
     virtual void setViewMode(WebViewMode) override;
 
+#if defined(USE_EFL)
+    virtual bool moveSelectElementToNext() override;
+    virtual bool moveSelectElementToPrevious() override;
+#endif
+
 private:
     void didUpdateTopControls();
     void setTopControlsContentOffset(float);
@@ -775,6 +780,11 @@ private:
     Element* nextTextOrSelectElement(Element*);
     Element* previousTextOrSelectElement(Element*);
     IntRect getElementBounds(const Element&) const;
+
+#if defined(USE_EFL)
+    Element* nextSelectElement(Element*);
+    Element* previousSelectElement(Element*);
+#endif
 };
 
 // We have no ways to check if the specified WebView is an instance of

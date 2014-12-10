@@ -4785,4 +4785,149 @@ void WebViewImpl::setViewMode(WebViewMode viewMode)
         page()->setViewMode(static_cast<ViewMode>(viewMode));
 }
 
+bool WebViewImpl::moveSelectElementToNext()
+{
+    Element* focusElement = focusedElement();
+    if (!focusElement || !isSelectElement(*focusElement))
+        return false;
+
+    Element* nextElement = nextSelectElement(focusElement);
+    if (!nextElement)
+        return false;
+
+    if (isSelectElement(*nextElement) && !toHTMLSelectElement(nextElement)->length())
+        m_client->messageToClosePopup();
+
+    nextElement->scrollIntoViewIfNeeded(true /* centerAlways */);
+
+    bool handled = performClickOnElement(*nextElement);
+
+    return handled;
+}
+
+bool WebViewImpl::moveSelectElementToPrevious()
+{
+    Element* focusElement = focusedElement();
+
+    if (!focusElement || !isSelectElement(*focusElement))
+        return false;
+
+    Element* previousElement = previousSelectElement(focusElement);
+    if (!previousElement)
+        return false;
+
+    if (isSelectElement(*previousElement) && !toHTMLSelectElement(previousElement)->length())
+        m_client->messageToClosePopup();
+
+    previousElement->scrollIntoViewIfNeeded(true /* centerAlways */);
+
+    bool handled = performClickOnElement(*previousElement);
+
+    return handled;
+}
+
+Element* WebViewImpl::nextSelectElement(Element* element)
+{
+    if (!element)
+        return 0;
+
+    Element* nextElement = element;
+
+    if (nextElement->isFrameOwnerElement()) {
+        HTMLFrameOwnerElement& htmlFrameOwnerElement = *toHTMLFrameOwnerElement(nextElement);
+
+        // Checks if the frame is empty or not.
+        if (!htmlFrameOwnerElement.contentFrame())
+            return 0;
+
+        Document* ownerDocument = htmlFrameOwnerElement.contentDocument();
+        if (!ownerDocument || !(nextElement = ownerDocument->body()))
+            return 0;
+
+        // Checks if content editable flag on body has set.
+        if (nextElement->isContentEditable())
+            return nextElement;
+    }
+
+    while ((nextElement = ElementTraversal::next(*nextElement))) {
+        if (nextElement->hasTagName(HTMLNames::iframeTag)
+            || nextElement->hasTagName(HTMLNames::frameTag)) {
+            Element* frameOwnerElement = nextElement;
+
+            nextElement = nextSelectElement(nextElement);
+            if (!nextElement) {
+                nextElement = frameOwnerElement;
+                    continue;
+            }
+        }
+        if (nextElement->isFocusable() && isSelectElement(*nextElement))
+            break;
+    }
+
+    // If couldn't find anything in the current document scope,
+    // try finding in other document scope if present any.
+    if (!nextElement) {
+        if (element->document().frame() != mainFrameImpl()->frame() &&
+            !element->isFrameOwnerElement())
+            nextElement = nextSelectElement(ElementTraversal::next(
+                *element->document().ownerElement()));
+    }
+    return nextElement;
+}
+
+Element* WebViewImpl::previousSelectElement(Element* element)
+{
+    if (!element)
+        return 0;
+
+    Element* previousElement = element;
+
+    if (previousElement->isFrameOwnerElement()) {
+        HTMLFrameOwnerElement& htmlFrameOwnerElement = *toHTMLFrameOwnerElement(previousElement);
+
+        // Checks if the frame is empty or not.
+        if (!htmlFrameOwnerElement.contentFrame())
+            return 0;
+
+        Document* ownerDocument = htmlFrameOwnerElement.contentDocument();
+        if (!ownerDocument)
+            return 0;
+
+        previousElement = ParentNode::lastElementChild(*ownerDocument);
+        while (previousElement && ElementTraversal::firstWithin(*previousElement))
+            previousElement = ParentNode::lastElementChild(*previousElement);
+
+        if (!previousElement || (previousElement->isFocusable()
+            && isSelectElement(*previousElement)))
+            return previousElement;
+    }
+
+    while ((previousElement = ElementTraversal::previous(*previousElement))) {
+        if (previousElement->hasTagName(HTMLNames::iframeTag)
+            || previousElement->hasTagName(HTMLNames::frameTag)) {
+            Element* frameOwnerElement = previousElement;
+
+            previousElement = previousSelectElement(previousElement);
+            if (!previousElement) {
+                previousElement = frameOwnerElement;
+                continue;
+            }
+        }
+
+        if (previousElement->isFocusable() && isSelectElement(*previousElement))
+            break;
+    }
+
+    // If couldn't find anything in the current document scope,
+    // try finding in other document scope if present any.
+    if (!previousElement) {
+        if (element->document().frame() != mainFrameImpl()->frame() &&
+            !element->isFrameOwnerElement())
+            previousElement = previousSelectElement(ElementTraversal::previous(
+                *element->document().ownerElement()));
+    }
+
+    return previousElement;
+}
+
 } // namespace blink

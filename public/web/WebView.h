@@ -511,6 +511,11 @@ public:
 
     // Testing functionality for TestRunner ---------------------------------
 
+#if defined(USE_EFL)
+    virtual bool moveSelectElementToNext() = 0;
+    virtual bool moveSelectElementToPrevious() = 0;
+#endif
+
 protected:
     ~WebView() {}
 };
